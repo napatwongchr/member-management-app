@@ -1,11 +1,21 @@
 import React from "react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Field, Form } from "formik";
 import styled from "@emotion/styled";
+import { Button, Input, Select } from "antd";
 
-import DatePicker from "./DatePicker";
+import GenderField from "./GenderField";
+import DatePickerField from "./DatePickerField";
+import TextField from "./TextField";
+import SelectField from "./SelectField";
 
 import nationality from "../data/nationality.json";
 import dialCodes from "../data/dial.json";
+
+const TITLE_OPTIONS = [
+  { label: "Mr", value: "mr" },
+  { label: "Mrs/Ms", value: "ms" },
+  { label: "Miss", value: "miss" }
+];
 
 const INITIAL_VALUES = {
   title: "",
@@ -27,9 +37,21 @@ const INITIAL_VALUES = {
   expectedSalary: ""
 };
 
-function MemberForm() {
-  function handleSubmit(values) {
-    console.log(values);
+const uuidv4 = require("uuid/v4");
+
+function MemberForm({ members, setMembers }) {
+  function handleSubmit(values, form) {
+    let newMembers = {
+      ...values,
+      key: uuidv4(),
+      name: `${values.firstName} ${values.lastName}`,
+      gender: values.gender,
+      phone: `${values.dialCode} ${values.phoneNo}`,
+      nationality: values.nationality.split("-")[0]
+    };
+    setMembers([...members, newMembers]);
+    form.resetForm({ values: INITIAL_VALUES });
+    console.log(values, ";;");
   }
 
   return (
@@ -39,115 +61,137 @@ function MemberForm() {
           <Form>
             <FormContainer>
               <FormRow>
-                <div>
-                  <label>Title:</label>
-                  <Field as="select" name="title">
-                    <option defaultValue value="">
-                      Please select
-                    </option>
-                    <option value="mr">Mr</option>
-                    <option value="ms">Mrs/Ms</option>
-                    <option value="miss">Miss</option>
+                <SelectField label="Title" name="title" style={{ width: 150 }}>
+                  <Select.Option defaultValue value="">
+                    Please select
+                  </Select.Option>
+                  {TITLE_OPTIONS.map(option => {
+                    return (
+                      <Select.Option key={option.value} value={option.value}>
+                        {option.label}
+                      </Select.Option>
+                    );
+                  })}
+                </SelectField>
+                <TextField id="firstName" name="firstName" label="First name" />
+                <TextField id="lastName" name="lastName" label="Last name" />
+              </FormRow>
+              <FormRow>
+                <DatePickerField />
+                <SelectField
+                  label="Nationality"
+                  name="nationality"
+                  style={{ width: 200 }}
+                  showSearch
+                  filterOption={(input, option) => {
+                    return (
+                      option.props.children
+                        .toLowerCase()
+                        .indexOf(input.toLowerCase()) >= 0
+                    );
+                  }}
+                >
+                  <Select.Option defaultValue value="">
+                    Please select
+                  </Select.Option>
+                  {nationality.map((item, index) => {
+                    return (
+                      <Select.Option
+                        key={`${item.nationality}-${index}`}
+                        value={`${item.nationality}-${index}`}
+                      >
+                        {item.nationality}
+                      </Select.Option>
+                    );
+                  })}
+                </SelectField>
+              </FormRow>
+              <FormRow>
+                <FormGroup>
+                  <label>CitizenID</label>
+                  <TextField
+                    id="citizenIdBlock1"
+                    name="citizenID.block1"
+                    noLabel
+                    containerStyle={{ mr: "0px", ml: "10px" }}
+                  />
+                  <Divider>-</Divider>
+                  <TextField
+                    id="citizenIdBlock2"
+                    name="citizenID.block2"
+                    noLabel
+                    containerStyle={{ mr: "0px" }}
+                  />
+                  <Divider>-</Divider>
+                  <TextField
+                    id="citizenIdBlock3"
+                    name="citizenID.block3"
+                    noLabel
+                    containerStyle={{ mr: "0px" }}
+                  />
+                  <Divider>-</Divider>
+                  <TextField
+                    id="citizenIdBlock4"
+                    name="citizenID.block4"
+                    noLabel
+                    containerStyle={{ mr: "0px" }}
+                  />
+                  <Divider>-</Divider>
+                  <TextField
+                    id="citizenIdBlock5"
+                    name="citizenID.block5"
+                    noLabel
+                    containerStyle={{ mr: "0px" }}
+                  />
+                </FormGroup>
+              </FormRow>
+              <FormRow>
+                <GenderField />
+              </FormRow>
+              <FormRow>
+                <SelectField
+                  label="Mobile phone"
+                  name="dialCode"
+                  containerStyle={{ mr: "0px" }}
+                >
+                  {dialCodes.map(item => {
+                    return (
+                      <Select.Option
+                        key={`${item.dial_code}-${item.code}`}
+                        value={`${item.dial_code}-${item.code}`}
+                      >
+                        {item.dial_code}
+                      </Select.Option>
+                    );
+                  })}
+                </SelectField>
+                <Divider>-</Divider>
+                <FormGroup>
+                  <Field type="text" name="phoneNo">
+                    {props => {
+                      return <Input {...props.field} />;
+                    }}
                   </Field>
-                </div>
-                <div>
-                  <label htmlFor="firstName">First name:</label>
-                  <Field type="text" name="firstName" />
-                </div>
-                <div>
-                  <label htmlFor="lastName">Last name:</label>
-                  <Field type="text" name="lastName" />
-                </div>
+                </FormGroup>
               </FormRow>
               <FormRow>
-                <div>
-                  <label htmlFor="birthday">Birthday:</label>
-                  <Field component={DatePicker} name="birthday" />
-                </div>
-                <div>
-                  <label htmlFor="nationality">Nationality:</label>
-                  <Field as="select" name="nationality">
-                    <option defaultValue value="">
-                      Please select
-                    </option>
-                    {nationality.map(item => {
-                      return (
-                        <option
-                          key={item.alpha_2_code}
-                          value={item.nationality}
-                        >
-                          {item.nationality}
-                        </option>
-                      );
-                    })}
-                  </Field>
-                </div>
+                <TextField
+                  id="passportNo"
+                  name="passportNo"
+                  label="Passport No"
+                />
               </FormRow>
               <FormRow>
-                <div>
-                  <label>CitizenID: </label>
-                  <Field type="text" name="citizenID.block1" />
-                  {"-"}
-                  <Field type="text" name="citizenID.block2" />
-                  {"-"}
-                  <Field type="text" name="citizenID.block3" />
-                  {"-"}
-                  <Field type="text" name="citizenID.block4" />
-                  {"-"}
-                  <Field type="text" name="citizenID.block5" />
-                </div>
-              </FormRow>
-              <FormRow>
-                <RadioGroup>
-                  <span>Gender: </span>
-                  <div>
-                    <Field
-                      id="maleOption"
-                      type="radio"
-                      name="gender"
-                      value="male"
-                    />
-                    <label htmlFor="maleOption">Male</label>
-                  </div>
-                  <div>
-                    <Field type="radio" name="gender" value="female" />
-                    <label htmlFor="femaleOption">Female</label>
-                  </div>
-                  <div>
-                    <Field type="radio" name="gender" value="other" />
-                    <label htmlFor="otherOption">Other</label>
-                  </div>
-                </RadioGroup>
-              </FormRow>
-              <FormRow>
-                <div>
-                  <label htmlFor="dialCode">Mobile phone:</label>
-                  <Field as="select" name="dialCode" value="+66">
-                    {dialCodes.map(item => {
-                      return (
-                        <option key={item.code} value={item.dial_code}>
-                          {item.name} ({item.dial_code})
-                        </option>
-                      );
-                    })}
-                  </Field>
-                  {"-"}
-                  <Field type="text" name="phoneNo" />
-                </div>
-              </FormRow>
-              <FormRow>
-                <div>
-                  <label htmlFor="passportNo">Passport No:</label>
-                  <Field type="text" name="passportNo" />
-                </div>
-              </FormRow>
-              <FormRow>
-                <div>
-                  <label htmlFor="expectedSalary">Expected Salary:*</label>
-                  <Field type="text" name="expectedSalary" />
-                  <span>THB</span>
-                </div>
-                <button type="submit">Submit</button>
+                <TextField
+                  id="expectedSalary"
+                  name="expectedSalary"
+                  label="Expected Salary"
+                  infoText={<InfoText>THB</InfoText>}
+                  containerStyle={{ mr: "100px" }}
+                />
+                <Button htmlType="submit" type="primary">
+                  SUBMIT
+                </Button>
               </FormRow>
             </FormContainer>
           </Form>
@@ -158,15 +202,29 @@ function MemberForm() {
 }
 
 const FormContainer = styled.div`
-  background-color: khaki;
+  background-color: white;
+  border-radius: 3px;
+  padding: 20px;
 `;
 
 const FormRow = styled.div`
   display: flex;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 10px;
 `;
 
-const RadioGroup = styled.div`
+const FormGroup = styled.div`
   display: flex;
+  align-items: center;
+`;
+
+const InfoText = styled.div`
+  margin-left: 10px;
+`;
+
+const Divider = styled.span`
+  margin: 0 10px;
 `;
 
 export default MemberForm;

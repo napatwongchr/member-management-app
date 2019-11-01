@@ -13,14 +13,18 @@
   "dependencies": {
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
+    "antd": "^3.24.3",
     "babel-plugin-emotion": "^10.0.23",
     "date-fns": "^2.6.0",
     "formik": "^2.0.3",
+    "moment": "^2.24.0",
     "next": "9.1.2",
     "react": "16.11.0",
     "react-dom": "16.11.0",
+    "react-table": "next",
     "react-widgets": "^4.4.11",
-    "react-widgets-date-fns": "^4.0.26"
+    "react-widgets-date-fns": "^4.0.26",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.0",
