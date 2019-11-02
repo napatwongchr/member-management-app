@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import styled from "@emotion/styled";
-import { useTable, useRowSelect } from "react-table";
+import { useTable, useRowSelect, usePagination } from "react-table";
+import { Button, Form, Row, Col } from "react-bootstrap";
 
-import { Button, Checkbox, Pagination } from "antd";
+import Pagination from "../components/Pagination";
+
+const PAGE_SIZE = 5;
 
 function MemberTable({ members, setMembers }) {
   const [toggleRowSelected, setToggleRowSelected] = useState(false);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
+
   const columns = [
     {
       id: "selection",
       Cell: ({ row }) => (
-        <div>
-          <Checkbox {...row.getToggleRowSelectedProps()} />
-          {/* <input type="checkbox" {...row.getToggleRowSelectedProps()} /> */}
-        </div>
+        <Form.Group controlId="formSelectAll">
+          <Form.Check
+            {...row.getToggleRowSelectedProps()}
+            type="checkbox"
+            label="Select All"
+          />
+        </Form.Group>
       )
     },
     {
@@ -39,14 +46,10 @@ function MemberTable({ members, setMembers }) {
       Cell: ({ row }) => {
         return (
           <div>
-            <Button type="danger" onClick={handleEditClick(row)} size="small">
+            <Button variant="primary" onClick={handleEditClick(row)} size="sm">
               Edit
             </Button>{" "}
-            <Button
-              type="primary"
-              onClick={handleRemoveClick(row)}
-              size="small"
-            >
+            <Button variant="danger" onClick={handleRemoveClick(row)} size="sm">
               Delete
             </Button>
           </div>
@@ -59,16 +62,22 @@ function MemberTable({ members, setMembers }) {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
     prepareRow,
     selectedFlatRows,
     toggleRowSelectedAll,
-    state: { selectedRowPaths }
+    pageCount,
+    page,
+    gotoPage,
+    nextPage,
+    previousPage,
+    state: { pageIndex, pageSize }
   } = useTable(
     {
       columns,
-      data: members
+      data: members,
+      initialState: { pageIndex: 0, pageSize: PAGE_SIZE }
     },
+    usePagination,
     useRowSelect
   );
 
@@ -84,10 +93,6 @@ function MemberTable({ members, setMembers }) {
     setToggleRowSelected(false);
     setSelectAllChecked(false);
   };
-
-  function handlePageChange(page) {
-    console.log(page);
-  }
 
   function handleSelectAll() {
     toggleRowSelectedAll(!toggleRowSelected);
@@ -105,26 +110,31 @@ function MemberTable({ members, setMembers }) {
 
   return (
     <TableContainer>
-      <TableMenuContainer>
-        <DeleteAllContainer>
-          <Checkbox
-            name="selectAll"
-            onChange={handleSelectAll}
-            checked={selectAllChecked}
-          >
-            Select All
-          </Checkbox>
-          <Button type="danger" size="small" onClick={handleDeleteSelectedItem}>
+      <Row>
+        <Col className="d-flex align-items-center">
+          <Form.Group className="mb-0 mr-2" controlId="formBasicCheckbox">
+            <Form.Check
+              name="selectAll"
+              onChange={handleSelectAll}
+              checked={selectAllChecked}
+              label="Select All"
+            />
+          </Form.Group>
+          <Button variant="danger" size="sm" onClick={handleDeleteSelectedItem}>
             DELETE
           </Button>
-        </DeleteAllContainer>
-        <Pagination
-          defaultCurrent={1}
-          pageSize={25}
-          total={50}
-          onChange={handlePageChange}
-        />
-      </TableMenuContainer>
+        </Col>
+        <Col className="d-flex justify-content-end">
+          <Pagination
+            pageIndex={pageIndex}
+            size={pageSize}
+            pageCount={pageCount}
+            gotoPage={gotoPage}
+            nextPage={nextPage}
+            previousPage={previousPage}
+          />
+        </Col>
+      </Row>
       <Table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup, index) => (
@@ -137,9 +147,9 @@ function MemberTable({ members, setMembers }) {
             </tr>
           ))}
         </thead>
-        {rows.length > 0 && (
+        {page.length > 0 && (
           <tbody {...getTableBodyProps()}>
-            {rows.map((row, index) => {
+            {page.map((row, index) => {
               return (
                 prepareRow(row) || (
                   <tr {...row.getRowProps()}>
@@ -157,7 +167,7 @@ function MemberTable({ members, setMembers }) {
           </tbody>
         )}
       </Table>
-      {rows.length === 0 && <NoDataContainer>No data.</NoDataContainer>}
+      {page.length === 0 && <NoDataContainer>No data.</NoDataContainer>}
     </TableContainer>
   );
 }
@@ -180,11 +190,5 @@ const NoDataContainer = styled.div`
   font-size: 20px;
   margin-top: 20px;
 `;
-
-const TableMenuContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-const DeleteAllContainer = styled.div``;
 
 export default MemberTable;
