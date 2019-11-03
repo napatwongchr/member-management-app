@@ -7,7 +7,9 @@ import Pagination from "../components/Pagination";
 
 const PAGE_SIZE = 5;
 
-function MemberTable({ members, setMembers }) {
+function MemberTable(props) {
+  let { members } = props;
+  const { setMembers, resetForm, setIsEditMode } = props;
   const [toggleRowSelected, setToggleRowSelected] = useState(false);
   const [selectAllChecked, setSelectAllChecked] = useState(false);
 
@@ -34,7 +36,7 @@ function MemberTable({ members, setMembers }) {
     },
     {
       Header: "Mobile phone",
-      accessor: "phone"
+      accessor: "phoneNo"
     },
     {
       Header: "Nationality",
@@ -82,7 +84,13 @@ function MemberTable({ members, setMembers }) {
   );
 
   const handleEditClick = record => () => {
-    console.log("edit: ", record);
+    const selectedMember = members.find(
+      member => member.key === record.original.key
+    );
+    setIsEditMode(true);
+    resetForm({
+      values: selectedMember
+    });
   };
 
   const handleRemoveClick = record => () => {
@@ -149,7 +157,7 @@ function MemberTable({ members, setMembers }) {
         </thead>
         {page.length > 0 && (
           <tbody {...getTableBodyProps()}>
-            {page.map((row, index) => {
+            {page.map(row => {
               return (
                 prepareRow(row) || (
                   <tr {...row.getRowProps()}>
