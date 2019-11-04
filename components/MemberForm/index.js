@@ -52,10 +52,7 @@ function MemberForm(props) {
       }
       return member;
     });
-
-    setIsEditMode(false);
     setMembers(newMembers);
-
     toast.success("Your record has been updated !", {
       autoClose: 2300
     });
