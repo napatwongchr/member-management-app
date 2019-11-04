@@ -1,7 +1,12 @@
-import React from "react";
-import { Form as FormikForm } from "formik";
+import React, { Fragment } from "react";
+import { Form as FormikForm, Field } from "formik";
 import styled from "@emotion/styled";
 import { Button, Row, Col, Form, InputGroup } from "react-bootstrap";
+import { toast } from "react-toastify";
+
+import dateFnsLocalizer from "react-widgets-date-fns";
+import DateTimePicker from "react-widgets/lib/DateTimePicker";
+dateFnsLocalizer();
 
 import { INITIAL_VALUES } from "../../constants";
 import nationality from "../../data/nationality.json";
@@ -47,15 +52,18 @@ function MemberForm(props) {
       }
       return member;
     });
-    // console.log(newMembers, ";;;");
+
+    setIsEditMode(false);
     setMembers(newMembers);
-    resetForm({ values: INITIAL_VALUES });
-    // toast on updated
+
+    toast.success("Your record has been updated !", {
+      autoClose: 2300
+    });
   }
 
   return (
-    <FormContainer>
-      <FormikForm>
+    <FormikForm>
+      <FormContainer>
         <Row>
           <Col>
             <Form.Group as={Row} controlId="formTitle">
@@ -133,17 +141,32 @@ function MemberForm(props) {
                 Birthday:<RequiredMark>*</RequiredMark>
               </Form.Label>
               <Col>
-                <Form.Control
-                  type="text"
-                  name="birthday"
-                  value={values.birthday}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  isInvalid={touched.birthday && errors.birthday}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.birthday}
-                </Form.Control.Feedback>
+                <Field name="birthday">
+                  {props => {
+                    const { field, form } = props;
+
+                    function handleChange(value) {
+                      form.setFieldValue(field.name, value);
+                    }
+
+                    return (
+                      <Fragment>
+                        <DateTimePicker
+                          {...field}
+                          containerClassName={
+                            errors.birthday && "date-picker-error"
+                          }
+                          value={field.value ? new Date(field.value) : null}
+                          onChange={handleChange}
+                          time={false}
+                        />
+                        <DatepickerErrorMsg className="datepicker-error-msg">
+                          {errors.birthday}
+                        </DatepickerErrorMsg>
+                      </Fragment>
+                    );
+                  }}
+                </Field>
               </Col>
             </Form.Group>
           </Col>
@@ -416,8 +439,8 @@ function MemberForm(props) {
             )}
           </Col>
         </Row>
-      </FormikForm>
-    </FormContainer>
+      </FormContainer>
+    </FormikForm>
   );
 }
 
@@ -434,6 +457,13 @@ const RequiredMark = styled.span`
 const Divider = styled.span`
   display: flex;
   align-items: center;
+`;
+
+const DatepickerErrorMsg = styled.div`
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 80%;
+  color: #dc3545;
 `;
 
 export default MemberForm;

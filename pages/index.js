@@ -9,11 +9,17 @@ import MemberTable from "../components/MemberTable";
 
 import { INITIAL_VALUES } from "../constants";
 import generateMembers from "../data/members";
+
 import "bootstrap/dist/css/bootstrap.min.css";
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+toast.configure();
 
 import validate from "../components/MemberForm/validate";
 
 const uuidv4 = require("uuid/v4");
+import "react-widgets/dist/css/react-widgets.css";
 
 const membersMock = generateMembers();
 
@@ -41,6 +47,15 @@ function Home() {
           body: {
             backgroundColor: "#f5f5f5",
             fontSize: "16px"
+          },
+          ".rw-widget-input": {
+            boxShadow: "none"
+          },
+          ".rw-widget-container": {
+            border: "1px solid #ced4da"
+          },
+          ".date-picker-error": {
+            border: "1px solid #dc3545"
           }
         }}
       />
@@ -48,7 +63,7 @@ function Home() {
         <title>Member management app</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1>Member form management</h1>
+      <PageHeading>Member form management</PageHeading>
       <Formik
         initialValues={INITIAL_VALUES}
         validate={validate}
@@ -77,6 +92,10 @@ function Home() {
     </PageContainer>
   );
 }
+
+const PageHeading = styled.h1`
+  margin-bottom: 30px;
+`;
 
 const PageContainer = styled.div`
   padding: 30px;

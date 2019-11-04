@@ -18,7 +18,7 @@ export default function generateMembers() {
         lastName,
         dialCode: "+44",
         gender: randomItems(["male", "female", "unisex"]),
-        birthday: "13123123",
+        birthday: new Date(),
         phoneNo: "1213123123",
         nationality: "Thai",
         citizenIdBlock1: faker.random.number(),
