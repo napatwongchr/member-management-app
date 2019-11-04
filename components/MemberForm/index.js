@@ -151,15 +151,19 @@ function MemberForm(props) {
                         <DateTimePicker
                           {...field}
                           containerClassName={
-                            errors.birthday && "date-picker-error"
+                            touched.birthday &&
+                            errors.birthday &&
+                            "date-picker-error"
                           }
                           value={field.value ? new Date(field.value) : null}
                           onChange={handleChange}
                           time={false}
                         />
-                        <DatepickerErrorMsg className="datepicker-error-msg">
-                          {errors.birthday}
-                        </DatepickerErrorMsg>
+                        {touched.birthday && errors.birthday && (
+                          <DatepickerErrorMsg className="datepicker-error-msg">
+                            {errors.birthday}
+                          </DatepickerErrorMsg>
+                        )}
                       </Fragment>
                     );
                   }}
